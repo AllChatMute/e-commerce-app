@@ -11,4 +11,11 @@ export class UsersService {
   async createUser(user: CreateUserDto): Promise<User> {
     return await this.UserModel.insertOne(user);
   }
+
+  async isExists(email: string): Promise<boolean> {
+    const exists = await this.UserModel.exists({ email });
+
+    if (exists) return true;
+    return false;
+  }
 }
