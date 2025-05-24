@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 
@@ -22,7 +23,7 @@ export class AuthService {
     user: CreateUserDto,
     res: Response
   ): Promise<{ accessToken: string }> {
-    if (await this.usersService.isExists(user.email))
+    if (await this.usersService.findUser(user.email))
       throw new BadRequestException("User already exists");
 
     const userToCreate = {
@@ -35,6 +36,23 @@ export class AuthService {
       return this.generateAuthCookie(user, res);
     } catch {
       throw new InternalServerErrorException("Failed to register");
+    }
+  }
+
+  async signIn(
+    user: CreateUserDto,
+    res: Response
+  ): Promise<{ accessToken: string }> {
+    const foundedUser = await this.usersService.findUser(user.email);
+
+    if (!foundedUser) throw new NotFoundException("User not found");
+    if (!(await this.hashService.compare(user.password, foundedUser.password)))
+      throw new BadRequestException("Invalid password");
+
+    try {
+      return this.generateAuthCookie(user, res);
+    } catch {
+      throw new InternalServerErrorException("Failed to login");
     }
   }
 

@@ -15,4 +15,12 @@ export class AuthController {
   ) {
     return this.authService.signUp(user, response);
   }
+
+  @Post("login")
+  signIn(
+    @Body(ValidateEmailPipe) user: CreateUserDto,
+    @Res({ passthrough: true }) response: Response
+  ) {
+    return this.authService.signIn(user, response);
+  }
 }
