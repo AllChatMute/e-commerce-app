@@ -3,7 +3,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 
@@ -45,7 +45,7 @@ export class AuthService {
   ): Promise<{ accessToken: string }> {
     const foundedUser = await this.usersService.findUser(user.email);
 
-    if (!foundedUser) throw new NotFoundException("User not found");
+    if (!foundedUser) throw new UnauthorizedException("User not found");
     if (!(await this.hashService.compare(user.password, foundedUser.password)))
       throw new BadRequestException("Invalid password");
 

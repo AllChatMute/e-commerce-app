@@ -8,7 +8,7 @@ import {
 import { Request } from "express";
 import { ConfigService } from "@nestjs/config";
 
-export interface AuthRequest {
+export interface AuthRequest extends Request {
   cookies: {
     auth?: string;
   };
