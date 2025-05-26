@@ -1,9 +1,10 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "../schemas/user.schema";
 import { Product, ProductSchema } from "src/schemas/product.schema";
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forRootAsync({
