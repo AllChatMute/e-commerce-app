@@ -21,6 +21,33 @@ export class ProductsService {
     return product;
   }
 
+  async getProducts(name?: string, categories?: string): Promise<Product[]> {
+    const parsedCategories = categories?.split(",") || [];
+    const parsedName = name || "";
+
+    const matchObject = {};
+    const options = [
+      { name: { $regex: parsedName, $options: "i" } },
+      {
+        categories: {
+          $all: parsedCategories,
+        },
+      },
+    ];
+
+    if (parsedCategories.length > 0) {
+      matchObject["$and"] = options;
+    } else {
+      matchObject["$or"] = options;
+    }
+
+    return await this.productModel.aggregate([
+      {
+        $match: matchObject,
+      },
+    ]);
+  }
+
   async createProduct(product: CreateProductDto): Promise<Product> {
     const productToCreate = {
       productId: await this.generateId(),
