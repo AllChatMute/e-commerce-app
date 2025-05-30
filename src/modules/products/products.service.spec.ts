@@ -98,9 +98,23 @@ describe("ProductsService", () => {
     expect(response).toEqual([returnedProduct]);
   });
 
-  it("should throw 404 if not found", async () => {
+  it("should throw 404 if not found in getProductById", async () => {
     jest.spyOn(model, "findOne").mockResolvedValue(null);
 
     await expect(service.getProductById(1)).rejects.toThrow(NotFoundException);
+  });
+
+  it("should throw 404 if not found in updateProduct", async () => {
+    jest.spyOn(model, "findOneAndUpdate").mockResolvedValue(null);
+
+    await expect(service.updateProduct(1, createProduct)).rejects.toThrow(
+      NotFoundException
+    );
+  });
+
+  it("should throw 404 if not found in deleteProduct", async () => {
+    jest.spyOn(model, "findOneAndDelete").mockResolvedValue(null);
+
+    await expect(service.deleteProduct(1)).rejects.toThrow(NotFoundException);
   });
 });
