@@ -1,6 +1,5 @@
 import { HashService } from "./../../services/hash.service";
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -24,7 +23,7 @@ export class AuthService {
     res: Response
   ): Promise<{ accessToken: string }> {
     if (await this.usersService.findUser(user.email))
-      throw new BadRequestException("User already exists");
+      throw new UnauthorizedException("User already exists");
 
     const userToCreate = {
       email: user.email,
@@ -47,7 +46,7 @@ export class AuthService {
 
     if (!foundedUser) throw new UnauthorizedException("User not found");
     if (!(await this.hashService.compare(user.password, foundedUser.password)))
-      throw new BadRequestException("Invalid password");
+      throw new UnauthorizedException("Invalid password");
 
     try {
       return this.generateAuthCookie(user, res);

@@ -5,7 +5,7 @@ import { HashService } from "../../services/hash.service";
 import { Response } from "express";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { UnauthorizedException, BadRequestException } from "@nestjs/common";
+import { UnauthorizedException } from "@nestjs/common";
 
 const token = { accessToken: "test_token" };
 const user = { email: "email", password: "password" };
@@ -88,14 +88,14 @@ describe("AuthService", () => {
     ).rejects.toThrow(UnauthorizedException);
   });
 
-  it("should throw 400 if user exists", async () => {
+  it("should throw 401 if user exists", async () => {
     jest.spyOn(usersService, "findUser").mockResolvedValue(user);
     jest
       .spyOn(authService, "signUp")
-      .mockRejectedValue(new BadRequestException());
+      .mockRejectedValue(new UnauthorizedException());
 
     await expect(authService.signUp(user, mockResponse)).rejects.toThrow(
-      BadRequestException
+      UnauthorizedException
     );
   });
 });
