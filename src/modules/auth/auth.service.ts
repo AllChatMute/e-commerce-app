@@ -5,17 +5,18 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
-
 import { CreateUserDto } from "./types/createUserDto";
 import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
+import { CookieService } from "../../services/cookie.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly cookieService: CookieService
   ) {}
 
   async signUp(
@@ -32,7 +33,7 @@ export class AuthService {
 
     try {
       await this.usersService.createUser(userToCreate);
-      return this.generateAuthCookie(user, res);
+      return this.cookieService.generateAuthCookie(user, res);
     } catch {
       throw new InternalServerErrorException("Failed to register");
     }
@@ -49,25 +50,9 @@ export class AuthService {
       throw new UnauthorizedException("Invalid password");
 
     try {
-      return this.generateAuthCookie(user, res);
+      return this.cookieService.generateAuthCookie(user, res);
     } catch {
       throw new InternalServerErrorException("Failed to login");
     }
-  }
-
-  private async generateAuthCookie(
-    user: CreateUserDto,
-    response: Response
-  ): Promise<{ accessToken: string }> {
-    const accessToken = await this.jwtService.signAsync(user);
-
-    response.cookie("auth", accessToken, {
-      maxAge: 15 * 60 * 1000,
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-    });
-
-    return { accessToken };
   }
 }
