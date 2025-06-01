@@ -7,6 +7,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { UnauthorizedException } from "@nestjs/common";
 import { CookieService } from "../../services/cookie.service";
+import { CartRepositoryService } from "src/services/cartRepository.service";
 
 const token = { accessToken: "test_token" };
 const user = { email: "email", password: "password" };
@@ -39,6 +40,7 @@ describe("AuthService", () => {
             compare: jest.fn().mockResolvedValue(true),
           },
         },
+        CartRepositoryService,
 
         JwtService,
         CookieService,

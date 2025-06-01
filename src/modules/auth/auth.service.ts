@@ -6,17 +6,17 @@ import {
 } from "@nestjs/common";
 import { UsersService } from "../users/users.service";
 import { CreateUserDto } from "./types/createUserDto";
-import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
 import { CookieService } from "../../services/cookie.service";
+import { CartRepositoryService } from "../../services/cartRepository.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
-    private readonly jwtService: JwtService,
-    private readonly cookieService: CookieService
+    private readonly cookieService: CookieService,
+    private readonly cartRepositoryService: CartRepositoryService
   ) {}
 
   async signUp(
@@ -33,6 +33,7 @@ export class AuthService {
 
     try {
       await this.usersService.createUser(userToCreate);
+      await this.cartRepositoryService.createCart(user.email);
       return this.cookieService.generateAuthCookie(user, res);
     } catch {
       throw new InternalServerErrorException("Failed to register");

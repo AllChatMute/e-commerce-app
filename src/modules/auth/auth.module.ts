@@ -6,6 +6,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HashService } from "../../services/hash.service";
 import { CookieService } from "../../services/cookie.service";
+import { CartRepositoryService } from "src/services/cartRepository.service";
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { CookieService } from "../../services/cookie.service";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, HashService, CookieService],
+  providers: [AuthService, CartRepositoryService, HashService, CookieService],
 })
 export class AuthModule {}

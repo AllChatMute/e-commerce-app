@@ -7,6 +7,7 @@ import { UsersService } from "../users/users.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { Response } from "express";
+import { CartRepositoryService } from "src/services/cartRepository.service";
 
 const token = { accessToken: "test_token" };
 const user = { email: "email", password: "password" };
@@ -33,6 +34,7 @@ describe("AuthController", () => {
         },
         { provide: UsersService, useValue: {} },
         JwtService,
+        CartRepositoryService,
         ConfigService,
         HashService,
       ],
