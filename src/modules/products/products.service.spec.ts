@@ -28,7 +28,6 @@ describe("ProductsService", () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
-
         {
           provide: getModelToken("Product"),
           useValue: {
