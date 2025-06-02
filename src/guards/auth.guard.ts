@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import { ConfigService } from "@nestjs/config";
+import { CreateUserDto } from "src/modules/auth/types/createUserDto";
 
 export interface AuthRequest extends Request {
   cookies: {
@@ -27,9 +28,10 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException();
 
     try {
-      await this.jwtService.verifyAsync(token, {
+      const user: CreateUserDto = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get("JWT_SECRET_KEY"),
       });
+      request["email"] = user.email;
     } catch {
       throw new UnauthorizedException();
     }
