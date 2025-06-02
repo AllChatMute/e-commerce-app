@@ -12,4 +12,8 @@ export class CartRepositoryService {
   async createCart(email: string): Promise<Cart> {
     return await this.cartModel.insertOne({ ownerEmail: email });
   }
+
+  async getCart(email: string): Promise<Cart | null> {
+    return await this.cartModel.findOne({ ownerEmail: email });
+  }
 }
