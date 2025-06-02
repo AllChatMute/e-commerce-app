@@ -1,7 +1,19 @@
-import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { CartService } from "./cart.service";
 import { AuthGuard } from "../../guards/auth.guard";
 import { Request } from "express";
+
+export interface CartRequest extends Request {
+  email: string;
+}
 
 @Controller("cart")
 export class CartController {
@@ -9,7 +21,16 @@ export class CartController {
 
   @UseGuards(AuthGuard)
   @Get()
-  getCartProducts(@Req() request: Request & { email: string }) {
-    return this.cartService.getCartProducts(request);
+  getCartProducts(@Req() request: CartRequest) {
+    return this.cartService.getCartProducts(request.email);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(":id")
+  addProductToCart(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() request: CartRequest
+  ) {
+    return this.cartService.addProductToCart(request.email, id);
   }
 }

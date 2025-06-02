@@ -2,6 +2,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Injectable } from "@nestjs/common";
 import { Cart } from "../schemas/cart.schema";
 import { Model } from "mongoose";
+import { Product } from "src/schemas/product.schema";
 
 @Injectable()
 export class CartRepositoryService {
@@ -15,5 +16,16 @@ export class CartRepositoryService {
 
   async getCart(email: string): Promise<Cart | null> {
     return await this.cartModel.findOne({ ownerEmail: email });
+  }
+
+  async addProductToCart(
+    ownerEmail: string,
+    product: Product
+  ): Promise<Cart | null> {
+    return await this.cartModel.findOneAndUpdate(
+      { ownerEmail },
+      { $push: { products: product } },
+      { new: true }
+    );
   }
 }
