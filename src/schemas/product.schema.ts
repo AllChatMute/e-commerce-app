@@ -12,13 +12,16 @@ export class Product {
   name: string;
 
   @Prop({ required: false, default: "" })
-  description: string;
+  description?: string;
 
   @Prop({ required: true, min: 1 })
   price: number;
 
   @Prop({ required: false, default: [] })
-  categories: string[];
+  categories?: string[];
+
+  @Prop({ required: false })
+  count?: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

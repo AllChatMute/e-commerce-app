@@ -49,10 +49,12 @@ export class ProductsService {
   }
 
   async createProduct(product: CreateProductDto): Promise<Product> {
-    const productToCreate = {
+    const productToCreate: Product = {
       productId: await this.generateId(),
       ...product,
     };
+
+    delete productToCreate.count;
     try {
       return await this.productModel.insertOne(productToCreate);
     } catch {
@@ -64,6 +66,7 @@ export class ProductsService {
     productId: number,
     product: CreateProductDto
   ): Promise<Product> {
+    delete product.count;
     const updatedProduct = await this.productModel.findOneAndUpdate(
       { productId },
       product,

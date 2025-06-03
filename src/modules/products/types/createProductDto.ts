@@ -3,4 +3,5 @@ export interface CreateProductDto {
   description?: string;
   price: number;
   categories?: string[];
+  count?: number;
 }
