@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Request } from "express";
 import { Model } from "mongoose";
 import { Product } from "../../schemas/product.schema";
 import { CartRepositoryService } from "../../services/cartRepository.service";
+import { Cart } from "src/schemas/cart.schema";
 
 @Injectable()
 export class CartService {
@@ -20,10 +24,30 @@ export class CartService {
     return cart.products;
   }
 
-  async addProductToCart(ownerEmail: string, productId: number) {
+  async addProductToCart(ownerEmail: string, productId: number): Promise<Cart> {
     const product = await this.productModel.findOne({ productId });
     if (!product) throw new NotFoundException("Product not found");
 
-    await this.cartRepositoryService.addProductToCart(ownerEmail, product);
+    const updatedCart = await this.cartRepositoryService.addProductToCart(
+      ownerEmail,
+      product
+    );
+    if (!updatedCart)
+      throw new InternalServerErrorException("Failed to add product");
+
+    return updatedCart;
+  }
+
+  async deleteProductFromCart(
+    ownerEmail: string,
+    productId: number
+  ): Promise<Cart> {
+    const cart = await this.cartRepositoryService.deleteProductFromCart(
+      ownerEmail,
+      productId
+    );
+    if (!cart) throw new NotFoundException("Product not found");
+
+    return cart;
   }
 }

@@ -28,4 +28,15 @@ export class CartRepositoryService {
       { new: true }
     );
   }
+
+  async deleteProductFromCart(
+    ownerEmail: string,
+    productId: number
+  ): Promise<Cart | null> {
+    return await this.cartModel.findOneAndUpdate(
+      { ownerEmail },
+      { $pull: { products: { productId } } },
+      { new: true }
+    );
+  }
 }
