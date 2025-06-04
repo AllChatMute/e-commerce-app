@@ -25,12 +25,13 @@ export class CartService {
   }
 
   async addProductToCart(ownerEmail: string, productId: number): Promise<Cart> {
-    const product = await this.productModel.findOne({ productId });
+    const product = await this.productModel.findOne({ productId }).lean();
+
     if (!product) throw new NotFoundException("Product not found");
 
     const updatedCart = await this.cartRepositoryService.addProductToCart(
       ownerEmail,
-      product
+      { ...product, count: 1 }
     );
     if (!updatedCart)
       throw new InternalServerErrorException("Failed to add product");

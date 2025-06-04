@@ -10,10 +10,6 @@ export class CartRepositoryService {
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>
   ) {}
 
-  async createCart(email: string): Promise<Cart> {
-    return await this.cartModel.insertOne({ ownerEmail: email });
-  }
-
   async getCart(email: string): Promise<Cart | null> {
     return await this.cartModel.findOne({ ownerEmail: email });
   }
@@ -22,11 +18,29 @@ export class CartRepositoryService {
     ownerEmail: string,
     product: Product
   ): Promise<Cart | null> {
-    return await this.cartModel.findOneAndUpdate(
-      { ownerEmail },
-      { $push: { products: product } },
+    const updatedCart = await this.cartModel.findOneAndUpdate(
+      {
+        ownerEmail,
+        "products.productId": product.productId,
+      },
+      {
+        $inc: {
+          "products.$.count": 1,
+        },
+      },
       { new: true }
     );
+
+    if (!updatedCart) {
+      return this.cartModel.findOneAndUpdate(
+        {
+          ownerEmail,
+        },
+        { $addToSet: { products: product } },
+        { new: true, upsert: true }
+      );
+    }
+    return updatedCart;
   }
 
   async deleteProductFromCart(
