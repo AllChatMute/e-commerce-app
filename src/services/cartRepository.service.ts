@@ -43,6 +43,47 @@ export class CartRepositoryService {
     return updatedCart;
   }
 
+  async decreaseProductCount(
+    ownerEmail: string,
+    productId: number
+  ): Promise<Cart | null> {
+    const cart = await this.cartModel.findOne({
+      ownerEmail,
+      "products.productId": productId,
+    });
+
+    if (!cart) {
+      return null;
+    }
+
+    const product = cart.products.find((p) => p.productId === productId);
+
+    if (!product) {
+      return cart;
+    }
+
+    if (product.count === 1) {
+      return this.cartModel.findOneAndUpdate(
+        { ownerEmail },
+        { $pull: { products: { productId } } },
+        { new: true }
+      );
+    } else {
+      return this.cartModel.findOneAndUpdate(
+        {
+          ownerEmail,
+          "products.productId": productId,
+        },
+        {
+          $inc: {
+            "products.$.count": -1,
+          },
+        },
+        { new: true }
+      );
+    }
+  }
+
   async deleteProductFromCart(
     ownerEmail: string,
     productId: number

@@ -7,7 +7,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Product } from "../../schemas/product.schema";
 import { CartRepositoryService } from "../../services/cartRepository.service";
-import { Cart } from "src/schemas/cart.schema";
+import { Cart } from "../../schemas/cart.schema";
 
 @Injectable()
 export class CartService {
@@ -37,6 +37,17 @@ export class CartService {
       throw new InternalServerErrorException("Failed to add product");
 
     return updatedCart;
+  }
+
+  async decreaseProductCount(ownerEmail: string, productId: number) {
+    const cart = await this.cartRepositoryService.decreaseProductCount(
+      ownerEmail,
+      productId
+    );
+
+    if (!cart) throw new NotFoundException("Product not found");
+
+    return cart;
   }
 
   async deleteProductFromCart(

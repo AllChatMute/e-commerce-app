@@ -41,4 +41,12 @@ export class CartController {
   ) {
     return this.cartService.deleteProductFromCart(request.email, id);
   }
+
+  @Delete("dec/:id")
+  decreaseProductCount(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() request: CartRequest
+  ) {
+    return this.cartService.decreaseProductCount(request.email, id);
+  }
 }
