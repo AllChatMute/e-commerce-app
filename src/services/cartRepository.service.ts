@@ -10,6 +10,10 @@ export class CartRepositoryService {
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>
   ) {}
 
+  async createCart(ownerEmail: string) {
+    return await this.cartModel.insertOne({ ownerEmail, products: [] });
+  }
+
   async getCart(email: string): Promise<Cart | null> {
     return await this.cartModel.findOne({ ownerEmail: email });
   }

@@ -2,6 +2,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -26,6 +28,7 @@ export class CartController {
     return this.cartService.getCartProducts(request.email);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post(":id")
   addProductToCart(
     @Param("id", ParseIntPipe) id: number,
@@ -34,6 +37,7 @@ export class CartController {
     return this.cartService.addProductToCart(request.email, id);
   }
 
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(":id")
   deleteProductFromCart(
     @Param("id", ParseIntPipe) id: number,

@@ -19,8 +19,11 @@ export class CartService {
   async getCartProducts(ownerEmail: string): Promise<Product[]> {
     const cart = await this.cartRepositoryService.getCart(ownerEmail);
 
-    if (!cart) throw new NotFoundException();
-
+    if (!cart) {
+      const createdCart =
+        await this.cartRepositoryService.createCart(ownerEmail);
+      return createdCart.products;
+    }
     return cart.products;
   }
 
