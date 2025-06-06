@@ -14,7 +14,7 @@ const dto: CreateUserDto = {
   password: "password",
 };
 
-describe("AppController (e2e)", () => {
+describe("AuthController (e2e)", () => {
   let app: INestApplication<App>;
   let userModel: Model<User>;
 
