@@ -10,7 +10,7 @@ export class CartRepositoryService {
     @InjectModel(Cart.name) private readonly cartModel: Model<Cart>
   ) {}
 
-  async createCart(ownerEmail: string) {
+  async createCart(ownerEmail: string): Promise<Cart | null> {
     return await this.cartModel.insertOne({ ownerEmail, products: [] });
   }
 

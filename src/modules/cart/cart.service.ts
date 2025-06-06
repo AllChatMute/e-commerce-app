@@ -22,6 +22,8 @@ export class CartService {
     if (!cart) {
       const createdCart =
         await this.cartRepositoryService.createCart(ownerEmail);
+      if (!createdCart)
+        throw new InternalServerErrorException("Failed to create cart");
       return createdCart.products;
     }
     return cart.products;
