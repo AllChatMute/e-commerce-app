@@ -8,6 +8,7 @@ import {
 import { Request } from "express";
 import { ConfigService } from "@nestjs/config";
 import { CreateUserDto } from "src/modules/auth/types/createUserDto";
+import { Role } from "../types/role.enum";
 
 export interface AuthRequest extends Request {
   cookies: {
@@ -28,10 +29,12 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException();
 
     try {
-      const user: CreateUserDto = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get("JWT_SECRET_KEY"),
-      });
+      const user: CreateUserDto & { roles: Role[] } =
+        await this.jwtService.verifyAsync(token, {
+          secret: this.configService.get("JWT_SECRET_KEY"),
+        });
       request["email"] = user.email;
+      request["roles"] = user.roles;
     } catch {
       throw new UnauthorizedException();
     }

@@ -27,6 +27,7 @@ export class AuthService {
     const userToCreate = {
       email: user.email,
       password: await this.hashService.hash(user.password),
+      roles: ["user"],
     };
 
     try {

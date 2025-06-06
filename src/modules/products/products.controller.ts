@@ -15,6 +15,8 @@ import {
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./types/createProductDto";
 import { AuthGuard } from "../../guards/auth.guard";
+import { Roles } from "../../decorators/roles.decorator";
+import { Role } from "../../types/role.enum";
 
 @Controller("products")
 export class ProductsController {
@@ -33,12 +35,14 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
+  @Roles(Role.Admin)
   @UseGuards(AuthGuard)
   @Post()
   createProduct(@Body() product: CreateProductDto) {
     return this.productsService.createProduct(product);
   }
 
+  @Roles(Role.Admin)
   @UseGuards(AuthGuard)
   @Put(":id")
   updateProduct(
@@ -48,6 +52,7 @@ export class ProductsController {
     return this.productsService.updateProduct(id, product);
   }
 
+  @Roles(Role.Admin)
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(":id")
