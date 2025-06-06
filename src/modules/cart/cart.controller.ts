@@ -13,12 +13,15 @@ import {
 import { CartService } from "./cart.service";
 import { AuthGuard } from "../../guards/auth.guard";
 import { Request } from "express";
+import { Roles } from "../../decorators/roles.decorator";
+import { Role } from "../../types/role.enum";
+import { RolesGuard } from "../../guards/roles.guard";
 
 export interface CartRequest extends Request {
   email: string;
 }
-
-@UseGuards(AuthGuard)
+@Roles(Role.User)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller("cart")
 export class CartController {
   constructor(private readonly cartService: CartService) {}

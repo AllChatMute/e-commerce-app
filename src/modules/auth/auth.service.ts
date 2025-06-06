@@ -8,6 +8,7 @@ import { UsersService } from "../users/users.service";
 import { CreateUserDto } from "./types/createUserDto";
 import { Response } from "express";
 import { CookieService } from "../../services/cookie.service";
+import { Role } from "../../types/role.enum";
 
 @Injectable()
 export class AuthService {
@@ -24,15 +25,15 @@ export class AuthService {
     if (await this.usersService.findUser(user.email))
       throw new UnauthorizedException("User already exists");
 
-    const userToCreate = {
+    const userToCreate: CreateUserDto & { roles: Role[] } = {
       email: user.email,
       password: await this.hashService.hash(user.password),
-      roles: ["user"],
+      roles: [Role.User],
     };
 
     try {
       await this.usersService.createUser(userToCreate);
-      return this.cookieService.generateAuthCookie(user, res);
+      return this.cookieService.generateAuthCookie(userToCreate, res);
     } catch {
       throw new InternalServerErrorException("Failed to register");
     }
@@ -48,8 +49,10 @@ export class AuthService {
     if (!(await this.hashService.compare(user.password, foundedUser.password)))
       throw new UnauthorizedException("Invalid password");
 
+    const userToLogin = { ...user, roles: foundedUser.roles };
+
     try {
-      return this.cookieService.generateAuthCookie(user, res);
+      return this.cookieService.generateAuthCookie(userToLogin, res);
     } catch {
       throw new InternalServerErrorException("Failed to login");
     }
