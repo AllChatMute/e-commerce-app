@@ -7,9 +7,14 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { UnauthorizedException } from "@nestjs/common";
 import { CookieService } from "../../services/cookie.service";
+import { Role } from "../../types/role.enum";
 
 const token = { accessToken: "test_token" };
-const user = { email: "email", password: "password" };
+const user = {
+  email: "email",
+  password: "password",
+  roles: [Role.User, Role.Admin],
+};
 const mockResponse = {
   status: jest.fn().mockReturnThis(),
   json: jest.fn().mockReturnThis(),

@@ -20,6 +20,7 @@ import { RolesGuard } from "../../guards/roles.guard";
 export interface CartRequest extends Request {
   email: string;
 }
+
 @Roles(Role.User)
 @UseGuards(AuthGuard, RolesGuard)
 @Controller("cart")

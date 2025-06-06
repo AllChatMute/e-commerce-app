@@ -17,7 +17,7 @@ import { CreateProductDto } from "./types/createProductDto";
 import { AuthGuard } from "../../guards/auth.guard";
 import { Roles } from "../../decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
-import { RolesGuard } from "src/guards/roles.guard";
+import { RolesGuard } from "../../guards/roles.guard";
 
 @Controller("products")
 export class ProductsController {
