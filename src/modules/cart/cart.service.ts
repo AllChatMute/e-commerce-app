@@ -8,11 +8,13 @@ import { Model } from "mongoose";
 import { Product } from "../../schemas/product.schema";
 import { CartRepositoryService } from "../../services/cartRepository.service";
 import { Cart } from "../../schemas/cart.schema";
+import { ProductsRepositoryService } from "../../services/productsRepository.service";
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly cartRepositoryService: CartRepositoryService,
+    private readonly productsRepositoryService: ProductsRepositoryService,
     @InjectModel(Product.name) private readonly productModel: Model<Product>
   ) {}
 
@@ -30,7 +32,9 @@ export class CartService {
   }
 
   async addProductToCart(ownerEmail: string, productId: number): Promise<Cart> {
-    const product = await this.productModel.findOne({ productId }).lean();
+    const product = (await this.productsRepositoryService
+      .getProductById(productId)
+      .lean()) as unknown as Product;
 
     if (!product) throw new NotFoundException("Product not found");
 

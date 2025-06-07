@@ -3,19 +3,19 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
 import { Product } from "../../schemas/product.schema";
-import { Model } from "mongoose";
 import { CreateProductDto } from "./types/createProductDto";
+import { ProductsRepositoryService } from "../../services/productsRepository.service";
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectModel(Product.name) private readonly productModel: Model<Product>
+    private readonly productsRepositoryService: ProductsRepositoryService
   ) {}
 
   async getProductById(productId: number): Promise<Product> {
-    const product = await this.productModel.findOne({ productId });
+    const product =
+      await this.productsRepositoryService.getProductById(productId);
     if (!product) throw new NotFoundException("Product not found");
 
     return product;
@@ -41,11 +41,9 @@ export class ProductsService {
       matchObject["$or"] = options;
     }
 
-    return await this.productModel.aggregate([
-      {
-        $match: matchObject,
-      },
-    ]);
+    return await this.productsRepositoryService.getProductsByMatchObjectFilters(
+      matchObject
+    );
   }
 
   async createProduct(product: CreateProductDto): Promise<Product> {
@@ -56,7 +54,9 @@ export class ProductsService {
 
     delete productToCreate.count;
     try {
-      return await this.productModel.insertOne(productToCreate);
+      return await this.productsRepositoryService.createProduct(
+        productToCreate
+      );
     } catch {
       throw new InternalServerErrorException("Failed to create product");
     }
@@ -67,10 +67,9 @@ export class ProductsService {
     product: CreateProductDto
   ): Promise<Product> {
     delete product.count;
-    const updatedProduct = await this.productModel.findOneAndUpdate(
-      { productId },
-      product,
-      { new: true }
+    const updatedProduct = await this.productsRepositoryService.updateProduct(
+      productId,
+      product
     );
 
     if (!updatedProduct) throw new NotFoundException("Product not found");
@@ -79,15 +78,14 @@ export class ProductsService {
   }
 
   async deleteProduct(productId: number): Promise<undefined> {
-    const deletedProduct = await this.productModel.findOneAndDelete({
-      productId,
-    });
+    const deletedProduct =
+      await this.productsRepositoryService.deleteProduct(productId);
 
     if (!deletedProduct) throw new NotFoundException("Product not Found");
   }
 
   private async generateId() {
-    const products: Product[] = await this.productModel.find();
+    const products: Product[] = await this.productsRepositoryService.getAll();
 
     return products.length > 0
       ? Math.max(...products.map((item) => item.productId)) + 1
