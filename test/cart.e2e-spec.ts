@@ -11,6 +11,7 @@ import { CreateProductDto } from "../src/modules/products/types/createProductDto
 import { User } from "../src/schemas/user.schema";
 import { AuthGuard } from "../src/guards/auth.guard";
 import { AuthMockGuard } from "../src/guards/auth-mock.guard";
+import { Cart } from "../src/schemas/cart.schema";
 
 // categories проверяется отдельно
 const expectedProductStructure = {
@@ -18,6 +19,7 @@ const expectedProductStructure = {
   name: expect.any(String) as string,
   description: expect.any(String) as string,
   price: expect.any(Number) as number,
+  count: expect.any(Number) as number,
 };
 
 const createProductDto: CreateProductDto = {
@@ -36,10 +38,20 @@ const checkCorrectProductStructure = (product: Product) => {
   });
 };
 
-describe("ProductsController (e2e)", () => {
+const checkCorrectCartStructure = (cart: Cart) => {
+  expect(cart).toHaveProperty("ownerEmail");
+  expect(cart).toHaveProperty("products");
+
+  expect(typeof cart.ownerEmail).toEqual("string");
+  expect(cart.products).toBeInstanceOf(Array);
+  cart.products.forEach((product) => checkCorrectProductStructure(product));
+};
+
+describe("CartController (e2e)", () => {
   let app: INestApplication<App>;
-  let productModel: Model<Product>;
+  let cartModel: Model<Product>;
   let userModel: Model<User>;
+  let productModel: Model<Product>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -51,40 +63,46 @@ describe("ProductsController (e2e)", () => {
 
     app = moduleFixture.createNestApplication();
 
-    productModel = moduleFixture.get<Model<Product>>("ProductModel");
+    cartModel = moduleFixture.get<Model<Product>>("CartModel");
     userModel = moduleFixture.get<Model<User>>("UserModel");
+    productModel = moduleFixture.get<Model<Product>>("ProductModel");
 
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix("api");
     await app.init();
 
-    await productModel.deleteMany({});
+    await cartModel.deleteMany({});
     await userModel.deleteMany({});
+    await productModel.deleteMany({});
 
     await request(app.getHttpServer())
       .post("/api/auth/register")
       .send({ email: "admin@email.com", password: "password" });
+
+    await request(app.getHttpServer())
+      .post("/api/products")
+      .send(createProductDto);
   });
 
   afterAll(async () => {
-    await productModel.deleteMany({});
+    await cartModel.deleteMany({});
     await userModel.deleteMany({});
+    await productModel.deleteMany({});
     await app.close();
   });
 
-  it("POST /api/products - should return created product", async () => {
+  it("POST /api/cart/:id - should return cart with added product", async () => {
     const response = (await request(app.getHttpServer())
-      .post("/api/products")
-      .send(createProductDto)
-      .expect(201)) as unknown as Response & { body: Product };
+      .post("/api/cart/1")
+      .expect(200)) as unknown as Response & { body: Cart };
 
-    checkCorrectProductStructure(response.body);
+    checkCorrectCartStructure(response.body);
   });
 
-  it("GET /api/products - should return an array of products", async () => {
+  it("GET /api/cart - should return an array of products from cart", async () => {
     const response = (await request(app.getHttpServer())
-      .get("/api/products")
+      .get("/api/cart")
       .expect(200)) as unknown as Response & { body: Product[] };
 
     expect(response.body).toBeInstanceOf(Array);
@@ -94,40 +112,39 @@ describe("ProductsController (e2e)", () => {
     });
   });
 
-  it("GET /api/products/:id - should return single product", async () => {
+  it("second POST /api/cart/:id - should return cart with product's count incremented by 1", async () => {
     const response = (await request(app.getHttpServer())
-      .get("/api/products/1")
-      .expect(200)) as unknown as Response & { body: Product };
+      .post("/api/cart/1")
+      .expect(200)) as unknown as Response & { body: Cart };
 
-    checkCorrectProductStructure(response.body);
+    checkCorrectCartStructure(response.body);
+    const foundedProduct = response.body.products.find(
+      (item) => item.productId === 1
+    );
+    expect(foundedProduct?.count).toEqual(2);
   });
 
-  it("PUT /api/products/:id - should return updated product", async () => {
+  it("DELETE /api/cart/dec/:id - should return cart with product's count decreased by 1", async () => {
     const response = (await request(app.getHttpServer())
-      .put("/api/products/1")
-      .send({ ...createProductDto, price: 1500 })
-      .expect(200)) as unknown as Response & { body: Product };
+      .delete("/api/cart/dec/1")
+      .expect(200)) as unknown as Response & { body: Cart };
 
-    checkCorrectProductStructure(response.body);
-    expect(response.body.price).toEqual(1500);
+    checkCorrectCartStructure(response.body);
+    const foundedProduct = response.body.products.find(
+      (item) => item.productId === 1
+    );
+    expect(foundedProduct?.count).toEqual(1);
   });
 
-  it("DELETE /api/products/:id - should throw 204", async () => {
+  it("DELETE /api/cart/:id - should throw 204", async () => {
     await request(app.getHttpServer()).delete("/api/products/1").expect(204);
   });
 
-  it("GET /api/products/:id - should throw 404 if product not found", async () => {
-    await request(app.getHttpServer()).get("/api/products/1").expect(404);
+  it("POST /api/cart/:id - should throw 404 if product not found", async () => {
+    await request(app.getHttpServer()).post("/api/cart/2").expect(404);
   });
 
-  it("PUT /api/products/:id - should throw 404 if product not found", async () => {
-    await request(app.getHttpServer())
-      .put("/api/products/1")
-      .send({ ...createProductDto, price: 1500 })
-      .expect(404);
-  });
-
-  it("DELETE /api/products/:id - should throw 404 if product not found", async () => {
-    await request(app.getHttpServer()).delete("/api/products/1").expect(404);
+  it("DELETE /api/cart/dec/:id - should throw 404 if product not found", async () => {
+    await request(app.getHttpServer()).put("/api/cart/dec/2").expect(404);
   });
 });
