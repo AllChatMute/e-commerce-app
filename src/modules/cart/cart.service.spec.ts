@@ -2,8 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CartService } from "./cart.service";
 import { getModelToken } from "@nestjs/mongoose";
 import { CartRepositoryService } from "../../services/cartRepository.service";
-import { Model } from "mongoose";
-import { Product } from "../../schemas/product.schema";
+import { ProductsRepositoryService } from "../../services/productsRepository.service";
 import {
   InternalServerErrorException,
   NotFoundException,
@@ -27,8 +26,8 @@ const mockFunc = jest.fn().mockResolvedValue(mockCart);
 
 describe("CartService", () => {
   let service: CartService;
-  let productModel: Model<Product>;
   let cartRepository: CartRepositoryService;
+  let productsRepositoryService: ProductsRepositoryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,18 +58,24 @@ describe("CartService", () => {
           useValue: {},
         },
         {
-          provide: getModelToken("Product"),
+          provide: ProductsRepositoryService,
           useValue: {
-            findOne: jest.fn().mockReturnThis(),
+            getProductById: jest.fn().mockReturnThis(),
             lean: jest.fn(),
           },
+        },
+        {
+          provide: getModelToken("Product"),
+          useValue: {},
         },
       ],
     }).compile();
 
     service = module.get<CartService>(CartService);
-    productModel = module.get<Model<Product>>(getModelToken("Product"));
     cartRepository = module.get<CartRepositoryService>(CartRepositoryService);
+    productsRepositoryService = module.get<ProductsRepositoryService>(
+      ProductsRepositoryService
+    );
   });
 
   it("should be defined", () => {
@@ -84,7 +89,9 @@ describe("CartService", () => {
   });
 
   it("should return cart with added product", async () => {
-    jest.spyOn(productModel.findOne(), "lean").mockResolvedValue(mockProduct);
+    jest
+      .spyOn(productsRepositoryService.getProductById(1), "lean")
+      .mockResolvedValue(mockProduct);
     expect(await service.addProductToCart("test@mail.com", 1)).toEqual(
       mockCart
     );
@@ -120,7 +127,9 @@ describe("CartService", () => {
   });
 
   it("should throw 404 if product to add not found", async () => {
-    jest.spyOn(productModel.findOne(), "lean").mockResolvedValue(null);
+    jest
+      .spyOn(productsRepositoryService.getProductById(1), "lean")
+      .mockResolvedValue(null);
 
     await expect(service.addProductToCart("test@mail.com", 1)).rejects.toThrow(
       NotFoundException
@@ -128,7 +137,9 @@ describe("CartService", () => {
   });
 
   it("should throw 500 if failed to create product", async () => {
-    jest.spyOn(productModel.findOne(), "lean").mockResolvedValue(mockProduct);
+    jest
+      .spyOn(productsRepositoryService.getProductById(1), "lean")
+      .mockResolvedValue(mockProduct);
     jest.spyOn(cartRepository, "addProductToCart").mockResolvedValue(null);
 
     await expect(service.addProductToCart("test@mail.com", 1)).rejects.toThrow(
