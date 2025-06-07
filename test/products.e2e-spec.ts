@@ -27,6 +27,15 @@ const createProductDto: CreateProductDto = {
   categories: ["category"],
 };
 
+const checkCorrectProductStructure = (product: Product) => {
+  expect(product).toMatchObject(expectedProductStructure);
+  expect(product).toHaveProperty("categories");
+  expect(product.categories).toBeInstanceOf(Array);
+  product.categories!.forEach((category) => {
+    expect(typeof category).toBe("string");
+  });
+};
+
 describe("ProductsController (e2e)", () => {
   let app: INestApplication<App>;
   let productModel: Model<Product>;
@@ -50,13 +59,12 @@ describe("ProductsController (e2e)", () => {
     app.setGlobalPrefix("api");
     await app.init();
 
+    await productModel.deleteMany({});
+    await userModel.deleteMany({});
+
     await request(app.getHttpServer())
       .post("/api/auth/register")
       .send({ email: "admin@email.com", password: "password" });
-  });
-
-  beforeEach(async () => {
-    await productModel.deleteMany({});
   });
 
   afterAll(async () => {
@@ -65,12 +73,14 @@ describe("ProductsController (e2e)", () => {
     await app.close();
   });
 
-  // TODO: Добавить мок авторизации во все последующие тесты
   it("POST /api/products - should return created product", async () => {
     const response = (await request(app.getHttpServer())
       .post("/api/products")
       .send(createProductDto)
-      .expect(200)) as unknown as Response & { body: Product };
+      .expect(201)) as unknown as Response & { body: Product };
+
+    expect(response.body).toMatchObject(expectedProductStructure);
+    expect(response.body).toHaveProperty("categories");
   });
 
   it("GET /api/products - should return an array of products", async () => {
@@ -81,9 +91,44 @@ describe("ProductsController (e2e)", () => {
     expect(response.body).toBeInstanceOf(Array);
 
     response.body.forEach((item) => {
-      expect(item).toMatchObject(expectedProductStructure);
-      expect(item).toHaveProperty("categories");
-      expect(typeof item.categories).toBe("string");
+      checkCorrectProductStructure(item);
     });
+  });
+
+  it("GET /api/products/:id - should return single product", async () => {
+    const response = (await request(app.getHttpServer())
+      .get("/api/products/1")
+      .expect(200)) as unknown as Response & { body: Product };
+
+    checkCorrectProductStructure(response.body);
+  });
+
+  it("PUT /api/products/:id - should return updated product", async () => {
+    const response = (await request(app.getHttpServer())
+      .put("/api/products/1")
+      .send({ ...createProductDto, price: 1500 })
+      .expect(200)) as unknown as Response & { body: Product };
+
+    checkCorrectProductStructure(response.body);
+    expect(response.body.price).toEqual(1500);
+  });
+
+  it("DELETE /api/products/:id - should throw 204", async () => {
+    await request(app.getHttpServer()).delete("/api/products/1").expect(204);
+  });
+
+  it("GET /api/products/:id - should throw 404 if product not found", async () => {
+    await request(app.getHttpServer()).get("/api/products/1").expect(404);
+  });
+
+  it("PUT /api/products/:id - should throw 404 if product not found", async () => {
+    await request(app.getHttpServer())
+      .put("/api/products/1")
+      .send({ ...createProductDto, price: 1500 })
+      .expect(404);
+  });
+
+  it("DELETE /api/products/:id - should throw 404 if product not found", async () => {
+    await request(app.getHttpServer()).delete("/api/products/1").expect(404);
   });
 });
