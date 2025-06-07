@@ -9,8 +9,8 @@ import { Product } from "../src/schemas/product.schema";
 import { Response } from "express";
 import { CreateProductDto } from "../src/modules/products/types/createProductDto";
 import { User } from "../src/schemas/user.schema";
-import { AuthService } from "../src/modules/auth/auth.service";
-import { Role } from "../src/types/role.enum";
+import { AuthGuard } from "../src/guards/auth.guard";
+import { AuthMockGuard } from "../src/guards/auth-mock.guard";
 
 // categories проверяется отдельно
 const expectedProductStructure = {
@@ -35,7 +35,10 @@ describe("ProductsController (e2e)", () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useClass(AuthMockGuard)
+      .compile();
 
     app = moduleFixture.createNestApplication();
 
@@ -46,11 +49,14 @@ describe("ProductsController (e2e)", () => {
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix("api");
     await app.init();
+
+    await request(app.getHttpServer())
+      .post("/api/auth/register")
+      .send({ email: "admin@email.com", password: "password" });
   });
 
   beforeEach(async () => {
     await productModel.deleteMany({});
-    await userModel.deleteMany({});
   });
 
   afterAll(async () => {
