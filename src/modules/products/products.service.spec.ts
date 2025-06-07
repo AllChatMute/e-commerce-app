@@ -3,8 +3,7 @@ import { ProductsService } from "./products.service";
 import { getModelToken } from "@nestjs/mongoose";
 import { CreateProductDto } from "./types/createProductDto";
 import { NotFoundException } from "@nestjs/common";
-import { Model } from "mongoose";
-import { Product } from "../../schemas/product.schema";
+import { ProductsRepositoryService } from "../../services/productsRepository.service";
 
 const createProduct: CreateProductDto = {
   name: "mockName",
@@ -22,28 +21,43 @@ const mockFunc = jest.fn().mockResolvedValue(returnedProduct);
 
 describe("ProductsService", () => {
   let service: ProductsService;
-  let model: Model<Product>;
+  let productsRepositoryService: ProductsRepositoryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
         {
+          provide: ProductsRepositoryService,
+          useValue: {
+            getAll: jest.fn().mockResolvedValue([]),
+            getProductById: mockFunc,
+            getProductsByMatchObjectFilters: jest
+              .fn()
+              .mockResolvedValue([returnedProduct]),
+            createProduct: mockFunc,
+            updateProduct: mockFunc,
+            deleteProduct: mockFunc,
+          },
+        },
+        {
           provide: getModelToken("Product"),
           useValue: {
-            findOne: mockFunc,
-            insertOne: mockFunc,
-            findOneAndUpdate: mockFunc,
-            findOneAndDelete: mockFunc,
-            find: jest.fn().mockResolvedValue([]),
-            aggregate: jest.fn().mockResolvedValue([returnedProduct]),
+            // findOne: mockFunc,
+            // insertOne: mockFunc,
+            // findOneAndUpdate: mockFunc,
+            // findOneAndDelete: mockFunc,
+            // find: jest.fn().mockResolvedValue([]),
+            // aggregate: jest.fn().mockResolvedValue([returnedProduct]),
           },
         },
       ],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
-    model = module.get<Model<Product>>(getModelToken("Product"));
+    productsRepositoryService = module.get<ProductsRepositoryService>(
+      ProductsRepositoryService
+    );
   });
 
   it("should be defined", () => {
@@ -98,13 +112,17 @@ describe("ProductsService", () => {
   });
 
   it("should throw 404 if not found in getProductById", async () => {
-    jest.spyOn(model, "findOne").mockResolvedValue(null);
+    jest
+      .spyOn(productsRepositoryService, "getProductById")
+      .mockResolvedValue(null);
 
     await expect(service.getProductById(1)).rejects.toThrow(NotFoundException);
   });
 
   it("should throw 404 if not found in updateProduct", async () => {
-    jest.spyOn(model, "findOneAndUpdate").mockResolvedValue(null);
+    jest
+      .spyOn(productsRepositoryService, "updateProduct")
+      .mockResolvedValue(null);
 
     await expect(service.updateProduct(1, createProduct)).rejects.toThrow(
       NotFoundException
@@ -112,7 +130,9 @@ describe("ProductsService", () => {
   });
 
   it("should throw 404 if not found in deleteProduct", async () => {
-    jest.spyOn(model, "findOneAndDelete").mockResolvedValue(null);
+    jest
+      .spyOn(productsRepositoryService, "deleteProduct")
+      .mockResolvedValue(null);
 
     await expect(service.deleteProduct(1)).rejects.toThrow(NotFoundException);
   });
