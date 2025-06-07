@@ -63,7 +63,7 @@ export class CartRepositoryService {
     const product = cart.products.find((p) => p.productId === productId);
 
     if (!product) {
-      return cart;
+      return null;
     }
 
     if (product.count === 1) {
