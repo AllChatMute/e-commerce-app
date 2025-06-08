@@ -11,6 +11,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./types/createProductDto";
@@ -18,8 +19,10 @@ import { AuthGuard } from "../../guards/auth.guard";
 import { Roles } from "../../decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
 import { RolesGuard } from "../../guards/roles.guard";
+import { CacheInterceptor } from "@nestjs/cache-manager";
 
 @Controller("products")
+@UseInterceptors(CacheInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
