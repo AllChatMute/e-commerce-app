@@ -5,6 +5,7 @@ import { ConfigModule } from "@nestjs/config";
 import { DatabaseConfigModule } from "./configs/databaseConfig.module";
 import { ProductsModule } from "./modules/products/products.module";
 import { CartModule } from "./modules/cart/cart.module";
+import { CacheConfigModule } from "./configs/cacheConfig.module";
 
 @Module({
   imports: [
@@ -13,10 +14,10 @@ import { CartModule } from "./modules/cart/cart.module";
       envFilePath: ".env",
     }),
     DatabaseConfigModule,
+    CacheConfigModule,
     AuthModule,
     ProductsModule,
     CartModule,
   ],
-  providers: [],
 })
 export class AppModule {}
