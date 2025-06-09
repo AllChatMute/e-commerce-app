@@ -21,6 +21,8 @@ export interface CartRequest extends Request {
   email: string;
 }
 
+//TODO: Add caching,
+//fix unit tests
 @Roles(Role.User)
 @UseGuards(AuthGuard, RolesGuard)
 @Controller("cart")

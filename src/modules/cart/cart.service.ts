@@ -1,26 +1,26 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
 import { Product } from "../../schemas/product.schema";
 import { CartRepositoryService } from "../../services/cartRepository.service";
 import { Cart } from "../../schemas/cart.schema";
 import { ProductsRepositoryService } from "../../services/productsRepository.service";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly cartRepositoryService: CartRepositoryService,
     private readonly productsRepositoryService: ProductsRepositoryService,
-    @InjectModel(Product.name) private readonly productModel: Model<Product>
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async getCartProducts(ownerEmail: string): Promise<Product[]> {
     const cart = await this.cartRepositoryService.getCart(ownerEmail);
-
     if (!cart) {
       const createdCart =
         await this.cartRepositoryService.createCart(ownerEmail);
