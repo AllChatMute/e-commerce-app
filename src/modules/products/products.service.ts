@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,14 +6,13 @@ import {
 import { Product } from "../../schemas/product.schema";
 import { CreateProductDto } from "./types/createProductDto";
 import { ProductsRepositoryService } from "../../services/productsRepository.service";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from "cache-manager";
+import { CacheService } from "../../services/cache.service";
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly productsRepositoryService: ProductsRepositoryService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    private readonly cacheService: CacheService
   ) {}
 
   async getProductById(productId: number): Promise<Product> {
@@ -56,8 +54,9 @@ export class ProductsService {
       ...product,
     };
 
+    await this.cacheService.clearProductsCache();
     delete productToCreate.count;
-    await this.cacheManager.del("/api/products");
+    await this.cacheService.delete("/api/products");
     try {
       return await this.productsRepositoryService.createProduct(
         productToCreate
@@ -78,8 +77,9 @@ export class ProductsService {
     );
 
     if (!updatedProduct) throw new NotFoundException("Product not found");
-    await this.cacheManager.del("/api/products");
-    await this.cacheManager.del(`/api/products/${productId}`);
+
+    await this.cacheService.delete("/api/products");
+    await this.cacheService.delete(`/api/products/${productId}`);
 
     return updatedProduct;
   }
@@ -89,8 +89,8 @@ export class ProductsService {
       await this.productsRepositoryService.deleteProduct(productId);
 
     if (!deletedProduct) throw new NotFoundException("Product not Found");
-    await this.cacheManager.del("/api/products");
-    await this.cacheManager.del(`/api/products/${productId}`);
+    await this.cacheService.delete("/api/products");
+    await this.cacheService.delete(`/api/products/${productId}`);
   }
 
   private async generateId() {
