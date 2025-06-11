@@ -19,10 +19,10 @@ import { AuthGuard } from "../../guards/auth.guard";
 import { Roles } from "../../decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
 import { RolesGuard } from "../../guards/roles.guard";
-import { CacheInterceptor } from "@nestjs/cache-manager";
+import { SelectiveCacheInterceptor } from "src/interceptors/selectiveCache.interceptor";
 
 @Controller("products")
-@UseInterceptors(CacheInterceptor)
+@UseInterceptors(SelectiveCacheInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 

@@ -54,7 +54,6 @@ export class ProductsService {
       ...product,
     };
 
-    await this.cacheService.clearProductsCache();
     delete productToCreate.count;
     await this.cacheService.delete("/api/products");
     try {
