@@ -1,5 +1,5 @@
+import { CacheService } from "./../../services/cache.service";
 import {
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -8,15 +8,13 @@ import { Product } from "../../schemas/product.schema";
 import { CartRepositoryService } from "../../services/cartRepository.service";
 import { Cart } from "../../schemas/cart.schema";
 import { ProductsRepositoryService } from "../../services/productsRepository.service";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from "cache-manager";
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly cartRepositoryService: CartRepositoryService,
     private readonly productsRepositoryService: ProductsRepositoryService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    private readonly cacheService: CacheService
   ) {}
 
   async getCartProducts(ownerEmail: string): Promise<Product[]> {
@@ -44,6 +42,7 @@ export class CartService {
     );
     if (!updatedCart)
       throw new InternalServerErrorException("Failed to add product");
+    await this.cacheService.delete(`${ownerEmail}/api/cart`);
 
     return updatedCart;
   }
@@ -55,6 +54,7 @@ export class CartService {
     );
 
     if (!cart) throw new NotFoundException("Product not found");
+    await this.cacheService.delete(`${ownerEmail}/api/cart`);
 
     return cart;
   }
@@ -68,6 +68,7 @@ export class CartService {
       productId
     );
     if (!cart) throw new NotFoundException("Product not found");
+    await this.cacheService.delete(`${ownerEmail}/api/cart`);
 
     return cart;
   }

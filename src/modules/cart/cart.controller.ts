@@ -9,6 +9,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { CartService } from "./cart.service";
 import { AuthGuard } from "../../guards/auth.guard";
@@ -16,19 +17,21 @@ import { Request } from "express";
 import { Roles } from "../../decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
 import { RolesGuard } from "../../guards/roles.guard";
+import { UserCacheInterceptor } from "../../interceptors/userCache.interceptor";
+import { CacheKey } from "@nestjs/cache-manager";
 
 export interface CartRequest extends Request {
   email: string;
 }
 
-//TODO: Add caching,
-//fix unit tests
+@UseInterceptors(UserCacheInterceptor)
 @Roles(Role.User)
 @UseGuards(AuthGuard, RolesGuard)
 @Controller("cart")
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
+  @CacheKey("/api/cart")
   @Get()
   getCartProducts(@Req() request: CartRequest) {
     return this.cartService.getCartProducts(request.email);
