@@ -4,6 +4,7 @@ import { getModelToken } from "@nestjs/mongoose";
 import { CreateProductDto } from "./types/createProductDto";
 import { NotFoundException } from "@nestjs/common";
 import { ProductsRepositoryService } from "../../services/productsRepository.service";
+import { CacheService } from "../../services/cache.service";
 
 const createProduct: CreateProductDto = {
   name: "mockName",
@@ -42,13 +43,12 @@ describe("ProductsService", () => {
         },
         {
           provide: getModelToken("Product"),
+          useValue: {},
+        },
+        {
+          provide: CacheService,
           useValue: {
-            // findOne: mockFunc,
-            // insertOne: mockFunc,
-            // findOneAndUpdate: mockFunc,
-            // findOneAndDelete: mockFunc,
-            // find: jest.fn().mockResolvedValue([]),
-            // aggregate: jest.fn().mockResolvedValue([returnedProduct]),
+            delete: jest.fn(),
           },
         },
       ],

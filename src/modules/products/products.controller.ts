@@ -19,7 +19,7 @@ import { AuthGuard } from "../../guards/auth.guard";
 import { Roles } from "../../decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
 import { RolesGuard } from "../../guards/roles.guard";
-import { SelectiveCacheInterceptor } from "src/interceptors/selectiveCache.interceptor";
+import { SelectiveCacheInterceptor } from "../../interceptors/selectiveCache.interceptor";
 
 @Controller("products")
 @UseInterceptors(SelectiveCacheInterceptor)

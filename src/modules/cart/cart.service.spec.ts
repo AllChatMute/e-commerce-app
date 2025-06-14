@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
+import { CacheService } from "../../services/cache.service";
 
 const mockProduct = {
   productId: 1,
@@ -67,6 +68,12 @@ describe("CartService", () => {
         {
           provide: getModelToken("Product"),
           useValue: {},
+        },
+        {
+          provide: CacheService,
+          useValue: {
+            delete: jest.fn(),
+          },
         },
       ],
     }).compile();
