@@ -6,6 +6,9 @@ import { getModelToken } from "@nestjs/mongoose";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { NotFoundException } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Reflector } from "@nestjs/core";
+import { UserCacheInterceptor } from "../../interceptors/userCache.interceptor";
 
 const mockProduct = {
   productId: 1,
@@ -61,6 +64,14 @@ describe("CartController", () => {
         },
         JwtService,
         ConfigService,
+        { provide: CACHE_MANAGER, useValue: {} },
+        { provide: Reflector, useValue: {} },
+        {
+          provide: UserCacheInterceptor,
+          useValue: {
+            trackBy: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
