@@ -6,6 +6,7 @@ import { DatabaseConfigModule } from "./configs/databaseConfig.module";
 import { ProductsModule } from "./modules/products/products.module";
 import { CartModule } from "./modules/cart/cart.module";
 import { CacheConfigModule } from "./configs/cacheConfig.module";
+import { PaymentsModule } from "./modules/payments/payments.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CacheConfigModule } from "./configs/cacheConfig.module";
     AuthModule,
     ProductsModule,
     CartModule,
+    PaymentsModule,
   ],
 })
 export class AppModule {}
