@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Request } from "express";
-import { Role } from "../types/role.enum";
+import { Role } from "../../types/role.enum";
 
 @Injectable()
 export class AuthMockGuard implements CanActivate {

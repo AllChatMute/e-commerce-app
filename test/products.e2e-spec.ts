@@ -9,8 +9,8 @@ import { Product } from "../src/schemas/product.schema";
 import { Response } from "express";
 import { CreateProductDto } from "../src/modules/products/types/createProductDto";
 import { User } from "../src/schemas/user.schema";
-import { AuthGuard } from "../src/guards/auth.guard";
-import { AuthMockGuard } from "../src/guards/auth-mock.guard";
+import { AuthGuard } from "../src/common/guards/auth.guard";
+import { AuthMockGuard } from "../src/common/guards/auth-mock.guard";
 
 // categories проверяется отдельно
 const expectedProductStructure = {

@@ -12,12 +12,12 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { CartService } from "./cart.service";
-import { AuthGuard } from "../../guards/auth.guard";
+import { AuthGuard } from "../../common/guards/auth.guard";
 import { Request } from "express";
-import { Roles } from "../../decorators/roles.decorator";
+import { Roles } from "../../common/decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
-import { RolesGuard } from "../../guards/roles.guard";
-import { UserCacheInterceptor } from "../../interceptors/userCache.interceptor";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { UserCacheInterceptor } from "../../common/interceptors/userCache.interceptor";
 import { CacheKey } from "@nestjs/cache-manager";
 
 export interface CartRequest extends Request {

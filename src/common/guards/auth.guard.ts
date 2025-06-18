@@ -8,7 +8,7 @@ import {
 import { Request } from "express";
 import { ConfigService } from "@nestjs/config";
 import { CreateUserDto } from "src/modules/auth/types/createUserDto";
-import { Role } from "../types/role.enum";
+import { Role } from "../../types/role.enum";
 
 export interface AuthRequest extends Request {
   cookies: {

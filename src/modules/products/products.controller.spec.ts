@@ -8,7 +8,7 @@ import { ConfigService } from "@nestjs/config";
 import { NotFoundException } from "@nestjs/common";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Reflector } from "@nestjs/core";
-import { SelectiveCacheInterceptor } from "../../interceptors/selectiveCache.interceptor";
+import { SelectiveCacheInterceptor } from "../../common/interceptors/selectiveCache.interceptor";
 
 const createProduct: CreateProductDto = {
   name: "mockName",

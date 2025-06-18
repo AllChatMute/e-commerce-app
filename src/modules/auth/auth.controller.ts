@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "./types/createUserDto";
-import { ValidateEmailPipe } from "../../pipes/validateEmail.pipe";
+import { ValidateEmailPipe } from "../../common/pipes/validateEmail.pipe";
 import { Response } from "express";
 
 @Controller("auth")

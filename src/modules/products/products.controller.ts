@@ -15,11 +15,11 @@ import {
 } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./types/createProductDto";
-import { AuthGuard } from "../../guards/auth.guard";
-import { Roles } from "../../decorators/roles.decorator";
+import { AuthGuard } from "../../common/guards/auth.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
 import { Role } from "../../types/role.enum";
-import { RolesGuard } from "../../guards/roles.guard";
-import { SelectiveCacheInterceptor } from "../../interceptors/selectiveCache.interceptor";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { SelectiveCacheInterceptor } from "../../common/interceptors/selectiveCache.interceptor";
 
 @Controller("products")
 @UseInterceptors(SelectiveCacheInterceptor)
