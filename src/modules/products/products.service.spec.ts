@@ -5,6 +5,7 @@ import { CreateProductDto } from "./types/createProductDto";
 import { NotFoundException } from "@nestjs/common";
 import { ProductsRepositoryService } from "../../services/productsRepository.service";
 import { CacheService } from "../../services/cache.service";
+import { HelpersService } from "../../services/helpers.service";
 
 const createProduct: CreateProductDto = {
   name: "mockName",
@@ -51,6 +52,7 @@ describe("ProductsService", () => {
             delete: jest.fn(),
           },
         },
+        HelpersService,
       ],
     }).compile();
 
