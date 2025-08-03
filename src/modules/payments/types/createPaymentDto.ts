@@ -1,6 +1,5 @@
 import { IsNumber, IsString } from "class-validator";
 import { Currency } from "../../../types/currency.enum";
-import { Status } from "../../../types/status.enum";
 
 export class CreatePaymentDto {
   @IsNumber()
@@ -8,7 +7,4 @@ export class CreatePaymentDto {
 
   @IsString()
   currency: Currency;
-
-  @IsString()
-  status: Status;
 }

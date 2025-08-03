@@ -3,6 +3,7 @@ import { CreatePaymentDto } from "./types/createPaymentDto";
 import { PaymentsRepositoryService } from "src/services/paymentRepository.service";
 import { Request } from "express";
 import { Payment } from "../../schemas/payment.schema";
+import { Status } from "../../types/status.enum";
 
 @Injectable()
 export class PaymentsService {
@@ -16,6 +17,7 @@ export class PaymentsService {
   ): Promise<Payment> {
     const createdPayment = await this.paymentsRepositoryService.create({
       ...payment,
+      status: Status.PENDING,
       email: request.email,
     });
 
