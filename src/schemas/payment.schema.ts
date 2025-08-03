@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument } from "mongoose";
-import { currency } from "../types/currency.enum";
+import { Currency } from "../types/currency.enum";
 
 export type PaymentDocument = HydratedDocument<Payment>;
 
@@ -16,7 +16,7 @@ export class Payment {
   amount: number;
 
   @Prop({ required: true })
-  currency: currency;
+  currency: Currency;
 
   @Prop({ required: true })
   status: string;

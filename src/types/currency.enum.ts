@@ -1,4 +1,4 @@
-export enum currency {
+export enum Currency {
   RUB = "rub",
   USD = "usd",
   GBP = "gbp",
