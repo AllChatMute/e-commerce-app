@@ -7,9 +7,6 @@ export type PaymentDocument = HydratedDocument<Payment>;
 @Schema()
 export class Payment {
   @Prop({ required: true })
-  id: number;
-
-  @Prop({ required: true })
   email: string;
 
   @Prop({ required: true, min: 1 })
