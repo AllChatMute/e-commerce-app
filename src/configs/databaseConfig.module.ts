@@ -4,6 +4,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "../schemas/user.schema";
 import { Product, ProductSchema } from "../schemas/product.schema";
 import { Cart, CartSchema } from "../schemas/cart.schema";
+import { Payment, PaymentSchema } from "../schemas/payment.schema";
 
 @Global()
 @Module({
@@ -19,6 +20,7 @@ import { Cart, CartSchema } from "../schemas/cart.schema";
       { name: User.name, schema: UserSchema },
       { name: Product.name, schema: ProductSchema },
       { name: Cart.name, schema: CartSchema },
+      { name: Payment.name, schema: PaymentSchema },
     ]),
   ],
   exports: [MongooseModule],
