@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Payment } from "../schemas/payment.schema";
-import { Model } from "mongoose";
+import { Model, ObjectId } from "mongoose";
 
 @Injectable()
 export class PaymentsRepositoryService {
@@ -11,5 +11,9 @@ export class PaymentsRepositoryService {
 
   async create(payment: Payment): Promise<Payment | null> {
     return this.paymentModel.insertOne(payment);
+  }
+
+  async getById(id: ObjectId): Promise<Payment | null> {
+    return this.paymentModel.findById(id);
   }
 }
