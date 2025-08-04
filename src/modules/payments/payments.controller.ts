@@ -31,8 +31,8 @@ export class PaymentsController {
     return this.paymentsService.getPaymentById(id);
   }
 
-  @Post()
-  refundPayment() {
-    return this.paymentsService.refundPayment();
+  @Post(":id")
+  refundPayment(@Param("id") id: ObjectId) {
+    return this.paymentsService.refundPayment(id);
   }
 }

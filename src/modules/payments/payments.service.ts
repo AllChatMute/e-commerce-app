@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { CreatePaymentDto } from "./types/createPaymentDto";
-import { PaymentsRepositoryService } from "src/services/paymentRepository.service";
+import { PaymentsRepositoryService } from "../../services/paymentRepository.service";
 import { Request } from "express";
 import { Payment } from "../../schemas/payment.schema";
 import { Status } from "../../types/status.enum";
@@ -23,7 +23,7 @@ export class PaymentsService {
   ): Promise<Payment> {
     const createdPayment = await this.paymentsRepositoryService.create({
       ...payment,
-      status: Status.PENDING,
+      status: Status.ACCEPTED,
       email: request.email,
     });
 
@@ -44,5 +44,16 @@ export class PaymentsService {
     return foundedPayment;
   }
 
-  async refundPayment() {}
+  async refundPayment(id: ObjectId): Promise<Payment | null> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException("Invalid id");
+    }
+
+    const rejectedPayment =
+      await this.paymentsRepositoryService.rejectPayment(id);
+
+    if (!rejectedPayment) throw new NotFoundException();
+
+    return rejectedPayment;
+  }
 }
