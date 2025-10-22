@@ -8,6 +8,9 @@ import { getModelToken } from "@nestjs/mongoose";
 import { RequestWithEmail } from "../../types/requestWithEmail.interface";
 import { CreatePaymentDto } from "./types/createPaymentDto";
 import { Currency } from "../../types/currency.enum";
+import { Status } from "../../types/status.enum";
+import mongoose from "mongoose";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 
 const mockRequest = {
   email: "mock@mail.com",
@@ -18,14 +21,33 @@ const mockCreatePaymentDto: CreatePaymentDto = {
   currency: Currency.RUB,
 };
 
+const mockReturnedPayment = {
+  email: "mock@mail.com",
+  amount: 1000,
+  currency: Currency.RUB,
+  status: Status.ACCEPTED,
+};
+
+const mockMongooseId = new mongoose.Schema.Types.ObjectId(
+  "60f0f7f0f0f0f0f0f0f0f0f0"
+);
+
 describe("PaymentsController", () => {
   let controller: PaymentsController;
+  let service: PaymentsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PaymentsController],
       providers: [
-        { provide: PaymentsService, useValue: {} },
+        {
+          provide: PaymentsService,
+          useValue: {
+            createPayment: jest.fn().mockReturnValue(mockReturnedPayment),
+            getPaymentById: jest.fn().mockReturnValue(mockReturnedPayment),
+            refundPayment: jest.fn().mockReturnValue(mockReturnedPayment),
+          },
+        },
         PaymentsRepositoryService,
         { provide: getModelToken("Payment"), useValue: {} },
         JwtService,
@@ -34,6 +56,7 @@ describe("PaymentsController", () => {
     }).compile();
 
     controller = module.get<PaymentsController>(PaymentsController);
+    service = module.get<PaymentsService>(PaymentsService);
   });
 
   it("should be defined", () => {
@@ -41,6 +64,50 @@ describe("PaymentsController", () => {
   });
 
   it("should return created payment ", async () => {
-    expect(await controller.createPayment(mockCreatePaymentDto, mockRequest)).;
+    expect(
+      await controller.createPayment(mockCreatePaymentDto, mockRequest)
+    ).toEqual(mockReturnedPayment);
+  });
+
+  it("should return payment by id", async () => {
+    expect(await controller.getPaymentById(mockMongooseId)).toEqual(
+      mockReturnedPayment
+    );
+  });
+
+  it("should return refunded payment", async () => {
+    expect(await controller.refundPayment(mockMongooseId)).toEqual(
+      mockReturnedPayment
+    );
+  });
+
+  it("should throw 400 if invalid id", async () => {
+    jest
+      .spyOn(service, "getPaymentById")
+      .mockRejectedValue(new BadRequestException());
+
+    await expect(controller.getPaymentById(mockMongooseId)).rejects.toThrow(
+      BadRequestException
+    );
+  });
+
+  it("should throw 400 if invalid id", async () => {
+    jest
+      .spyOn(service, "refundPayment")
+      .mockRejectedValue(new BadRequestException());
+
+    await expect(controller.refundPayment(mockMongooseId)).rejects.toThrow(
+      BadRequestException
+    );
+  });
+
+  it("should throw 404 if payment not found", async () => {
+    jest
+      .spyOn(service, "refundPayment")
+      .mockRejectedValue(new NotFoundException());
+
+    await expect(controller.refundPayment(mockMongooseId)).rejects.toThrow(
+      NotFoundException
+    );
   });
 });
