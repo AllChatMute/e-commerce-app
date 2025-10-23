@@ -9,7 +9,7 @@ import { PaymentsRepositoryService } from "../../services/paymentRepository.serv
 import { Request } from "express";
 import { Payment } from "../../schemas/payment.schema";
 import { Status } from "../../types/status.enum";
-import { isValidObjectId, ObjectId } from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 @Injectable()
 export class PaymentsService {
@@ -33,7 +33,7 @@ export class PaymentsService {
     return createdPayment;
   }
 
-  async getPaymentById(id: ObjectId): Promise<Payment | null> {
+  async getPaymentById(id: string): Promise<Payment | null> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Invalid id");
     }
@@ -44,7 +44,7 @@ export class PaymentsService {
     return foundedPayment;
   }
 
-  async refundPayment(id: ObjectId): Promise<Payment | null> {
+  async refundPayment(id: string): Promise<Payment | null> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Invalid id");
     }

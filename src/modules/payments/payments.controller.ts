@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -11,7 +12,6 @@ import { PaymentsService } from "./payments.service";
 import { AuthGuard } from "../../common/guards/auth.guard";
 import { CreatePaymentDto } from "./types/createPaymentDto";
 import { RequestWithEmail } from "src/types/requestWithEmail.interface";
-import { ObjectId } from "mongoose";
 
 @UseGuards(AuthGuard)
 @Controller("payments")
@@ -27,12 +27,12 @@ export class PaymentsController {
   }
 
   @Get(":id")
-  getPaymentById(@Param("id") id: ObjectId) {
+  getPaymentById(@Param("id") id: string) {
     return this.paymentsService.getPaymentById(id);
   }
 
-  @Post(":id")
-  refundPayment(@Param("id") id: ObjectId) {
+  @Delete(":id")
+  refundPayment(@Param("id") id: string) {
     return this.paymentsService.refundPayment(id);
   }
 }

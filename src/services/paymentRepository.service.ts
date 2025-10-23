@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Payment } from "../schemas/payment.schema";
-import { Model, ObjectId } from "mongoose";
+import { Model } from "mongoose";
 import { Status } from "../types/status.enum";
 
 @Injectable()
@@ -14,11 +14,11 @@ export class PaymentsRepositoryService {
     return this.paymentModel.insertOne(payment);
   }
 
-  async getById(id: ObjectId): Promise<Payment | null> {
+  async getById(id: string): Promise<Payment | null> {
     return this.paymentModel.findById(id);
   }
 
-  async rejectPayment(id: ObjectId): Promise<Payment | null> {
+  async rejectPayment(id: string): Promise<Payment | null> {
     return this.paymentModel.findByIdAndUpdate(
       id,
       { status: Status.REJECTED },

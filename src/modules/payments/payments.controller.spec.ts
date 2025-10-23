@@ -9,7 +9,6 @@ import { RequestWithEmail } from "../../types/requestWithEmail.interface";
 import { CreatePaymentDto } from "./types/createPaymentDto";
 import { Currency } from "../../types/currency.enum";
 import { Status } from "../../types/status.enum";
-import mongoose from "mongoose";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 
 const mockRequest = {
@@ -28,9 +27,7 @@ const mockReturnedPayment = {
   status: Status.ACCEPTED,
 };
 
-const mockMongooseId = new mongoose.Schema.Types.ObjectId(
-  "60f0f7f0f0f0f0f0f0f0f0f0"
-);
+const mockMongooseId = "688fa2338331d6a502805362";
 
 describe("PaymentsController", () => {
   let controller: PaymentsController;
