@@ -78,7 +78,7 @@ describe("PaymentsController", () => {
     );
   });
 
-  it("should throw 400 if invalid id", async () => {
+  it("should throw 400 if invalid id in getPaymentById", async () => {
     jest
       .spyOn(service, "getPaymentById")
       .mockRejectedValue(new BadRequestException());
@@ -88,7 +88,7 @@ describe("PaymentsController", () => {
     );
   });
 
-  it("should throw 400 if invalid id", async () => {
+  it("should throw 400 if invalid id in refundPayment", async () => {
     jest
       .spyOn(service, "refundPayment")
       .mockRejectedValue(new BadRequestException());
@@ -98,7 +98,7 @@ describe("PaymentsController", () => {
     );
   });
 
-  it("should throw 404 if payment not found", async () => {
+  it("should throw 404 if payment not found in refundPayment", async () => {
     jest
       .spyOn(service, "refundPayment")
       .mockRejectedValue(new NotFoundException());
