@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import * as request from "supertest";
+import request from "supertest";
 import { App } from "supertest/types";
 import { AppModule } from "./../src/app.module";
 import { User } from "../src/schemas/user.schema";
 import { Model } from "mongoose";
-import * as cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import { CreateUserDto } from "../src/modules/auth/types/createUserDto";
 import { Response } from "express";
 
