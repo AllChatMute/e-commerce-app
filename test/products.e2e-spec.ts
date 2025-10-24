@@ -4,11 +4,9 @@ import request from "supertest";
 import { App } from "supertest/types";
 import { AppModule } from "./../src/app.module";
 import { Model } from "mongoose";
-import cookieParser from "cookie-parser";
 import { Product } from "../src/schemas/product.schema";
 import { Response } from "express";
 import { CreateProductDto } from "../src/modules/products/types/createProductDto";
-import { User } from "../src/schemas/user.schema";
 import { AuthGuard } from "../src/common/guards/auth.guard";
 import { AuthMockGuard } from "../src/common/guards/auth-mock.guard";
 
@@ -39,7 +37,6 @@ const checkCorrectProductStructure = (product: Product) => {
 describe("ProductsController (e2e)", () => {
   let app: INestApplication<App>;
   let productModel: Model<Product>;
-  let userModel: Model<User>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -52,24 +49,16 @@ describe("ProductsController (e2e)", () => {
     app = moduleFixture.createNestApplication();
 
     productModel = moduleFixture.get<Model<Product>>("ProductModel");
-    userModel = moduleFixture.get<Model<User>>("UserModel");
 
-    app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix("api");
     await app.init();
 
     await productModel.deleteMany({});
-    await userModel.deleteMany({});
-
-    await request(app.getHttpServer())
-      .post("/api/auth/register")
-      .send({ email: "admin@email.com", password: "password" });
   });
 
   afterAll(async () => {
     await productModel.deleteMany({});
-    await userModel.deleteMany({});
     await app.close();
   });
 

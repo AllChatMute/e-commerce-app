@@ -8,7 +8,6 @@ import cookieParser from "cookie-parser";
 import { Product } from "../src/schemas/product.schema";
 import { Response } from "express";
 import { CreateProductDto } from "../src/modules/products/types/createProductDto";
-import { User } from "../src/schemas/user.schema";
 import { AuthGuard } from "../src/common/guards/auth.guard";
 import { AuthMockGuard } from "../src/common/guards/auth-mock.guard";
 import { Cart } from "../src/schemas/cart.schema";
@@ -50,7 +49,6 @@ const checkCorrectCartStructure = (cart: Cart) => {
 describe("CartController (e2e)", () => {
   let app: INestApplication<App>;
   let cartModel: Model<Product>;
-  let userModel: Model<User>;
   let productModel: Model<Product>;
 
   beforeAll(async () => {
@@ -64,7 +62,6 @@ describe("CartController (e2e)", () => {
     app = moduleFixture.createNestApplication();
 
     cartModel = moduleFixture.get<Model<Product>>("CartModel");
-    userModel = moduleFixture.get<Model<User>>("UserModel");
     productModel = moduleFixture.get<Model<Product>>("ProductModel");
 
     app.use(cookieParser());
@@ -73,12 +70,7 @@ describe("CartController (e2e)", () => {
     await app.init();
 
     await cartModel.deleteMany({});
-    await userModel.deleteMany({});
     await productModel.deleteMany({});
-
-    await request(app.getHttpServer())
-      .post("/api/auth/register")
-      .send({ email: "admin@email.com", password: "password" });
 
     await request(app.getHttpServer())
       .post("/api/products")
@@ -87,7 +79,6 @@ describe("CartController (e2e)", () => {
 
   afterAll(async () => {
     await cartModel.deleteMany({});
-    await userModel.deleteMany({});
     await productModel.deleteMany({});
     await app.close();
   });
