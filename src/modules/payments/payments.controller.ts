@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -31,6 +33,7 @@ export class PaymentsController {
     return this.paymentsService.getPaymentById(id);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Delete(":id")
   refundPayment(@Param("id") id: string) {
     return this.paymentsService.refundPayment(id);
