@@ -87,7 +87,7 @@ describe("PaymentsController (e2e", () => {
     expect(response.body._id).toEqual(testPaymentResponse.body._id);
   });
 
-  it("DELETE /api/payments/:id", async () => {
+  it("DELETE /api/payments/:id - should return rejected payment", async () => {
     const response = (await request(app.getHttpServer())
       .delete(`/api/payments/${testPaymentResponse.body._id}`)
       .expect(200)) as unknown as Response & {
@@ -96,5 +96,29 @@ describe("PaymentsController (e2e", () => {
 
     checkCorrectPaymentStructure(response.body);
     expect(response.body._id).toEqual(testPaymentResponse.body._id);
+  });
+
+  // TODO: tests that throw error
+
+  it("GET /api/payment/:id - should throw 400 if objectId invalid", async () => {
+    await request(app.getHttpServer()).get("/api/payments/INVALID").expect(400);
+  });
+
+  it("GET /api/payment/:id - should throw 404 if payment not found", async () => {
+    await request(app.getHttpServer())
+      .get(`/api/payments/11aaa1a1a11aaa1111aa1a11`) // this id doesn't exists
+      .expect(404);
+  });
+
+  it("DELETE /api/payment/:id - should throw 400 if objectId invalid", async () => {
+    await request(app.getHttpServer())
+      .delete("/api/payments/INVALID")
+      .expect(400);
+  });
+
+  it("DELETE /api/payment/:id - should throw 404 if payment not found", async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/payments/11aaa1a1a11aaa1111aa1a11`) // this id doesn't exists
+      .expect(404);
   });
 });
