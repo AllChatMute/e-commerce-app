@@ -19,12 +19,12 @@ export class PaymentsService {
 
   async createPayment(
     payment: CreatePaymentDto,
-    request: Request & { email: string }
+    email: string
   ): Promise<Payment> {
     const createdPayment = await this.paymentsRepositoryService.create({
       ...payment,
       status: Status.ACCEPTED,
-      email: request.email,
+      email,
     });
 
     if (!createdPayment)
@@ -33,7 +33,7 @@ export class PaymentsService {
     return createdPayment;
   }
 
-  async getPaymentById(id: string): Promise<Payment | null> {
+  async getPaymentById(id: string): Promise<Payment> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Invalid id");
     }
@@ -44,7 +44,7 @@ export class PaymentsService {
     return foundedPayment;
   }
 
-  async refundPayment(id: string): Promise<Payment | null> {
+  async refundPayment(id: string): Promise<Payment> {
     if (!isValidObjectId(id)) {
       throw new BadRequestException("Invalid id");
     }

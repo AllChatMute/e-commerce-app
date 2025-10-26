@@ -98,8 +98,6 @@ describe("PaymentsController (e2e", () => {
     expect(response.body._id).toEqual(testPaymentResponse.body._id);
   });
 
-  // TODO: tests that throw error
-
   it("GET /api/payment/:id - should throw 400 if objectId invalid", async () => {
     await request(app.getHttpServer()).get("/api/payments/INVALID").expect(400);
   });

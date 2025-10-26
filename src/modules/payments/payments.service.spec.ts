@@ -68,7 +68,7 @@ describe("PaymentsService", () => {
 
   it("should return created payment ", async () => {
     expect(
-      await service.createPayment(mockCreatePaymentDto, mockRequest)
+      await service.createPayment(mockCreatePaymentDto, mockRequest.email)
     ).toEqual(
       expect.objectContaining<Payment>({
         email: expect.stringContaining("@") as string,

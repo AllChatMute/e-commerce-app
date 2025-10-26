@@ -25,7 +25,7 @@ export class PaymentsController {
     @Body() payment: CreatePaymentDto,
     @Req() request: RequestWithEmail
   ) {
-    return this.paymentsService.createPayment(payment, request);
+    return this.paymentsService.createPayment(payment, request.email);
   }
 
   @Get(":id")
